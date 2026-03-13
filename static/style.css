@@ -1,0 +1,116 @@
+body {
+    font-family: 'Times New Roman', serif;
+    font-size: large;
+    color: #FFFFFF;
+    background: #ba5b9e;
+    background: radial-gradient(circle,rgba(186, 91, 158, 1) 0%, rgba(24, 26, 31, 1) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    ;
+}
+
+.container {
+    background: rgba(237, 242, 235, 0.21);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(9.7px);
+    -webkit-backdrop-filter: blur(9.7px);
+    border: 1px solid rgba(237, 242, 235, 0.3);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 350px;
+}
+.header {
+    background: rgba(237, 242, 235, 0.21);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(9.7px);
+    -webkit-backdrop-filter: blur(9.7px);
+    border: 1px solid rgba(237, 242, 235, 0.3);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 350px;
+}
+
+
+h1 {
+    color: #FFFFFF;
+    font-style: oblique;
+    font-weight: bold;
+    background-color: #09090a;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+input[type="text"], input[type="password"], input[type="email"] {
+    width: 80%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    
+    background: rgba(255, 255, 255, 0.09);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-align: left;
+    font-weight: thin;
+    font-style: normal;
+}
+
+::placeholder {
+    color: #d6dadb;
+    font-weight: semi-bold;
+    font-style: oblique;
+}
+
+button {
+    width: 50%;
+    padding: 12px;
+    /* From https://css.glass */
+    background: rgba(24, 23, 24, 0.42);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(3.8px);
+    -webkit-backdrop-filter: blur(3.8px);
+    border: 1px solid rgba(24, 23, 24, 0.3);
+    color: white;
+    border: none;
+    font-weight: thin;
+    font-style: normal;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+button:hover {
+    background: rgba(24, 23, 24, 0.42);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(19.1px);
+    -webkit-backdrop-filter: blur(19.1px);
+    border: 1px solid rgba(24, 23, 24, 0.3);
+}
+
+p {
+    margin-top: 15px;
+    color: black;
+    font-style: normal;
+}
+
+a {
+    color:black;
+    font-weight: bold;
+    text-decoration-skip-ink: auto;
+}
+
+a:hover {
+    text-decoration: underline;
+}
