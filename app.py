@@ -1,17 +1,28 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, send_from_directory, url_for, session
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
+from flask_uploads import IMAGES, UploadSet, configure_uploads
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed, FileRequired, FileField
+from wtforms import SubmitField
+
+
 
 # creating a flask app
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+
+
 
 # configuring MySQL database connection
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'poli20'  # MySql password 
 app.config['MYSQL_DB'] = 'cat_app'
+#configurating for photos upload
+app.config['SECRET_KEY'] = '123321'
+app.config['UPLOADED_PHOTOS_DEST'] = 'uploads'
+
 
 mysql = MySQL(app)
 
@@ -80,6 +91,17 @@ def admin():
     return redirect(url_for('admin'))
 
 # route for user page
+photos = UploadSet('photos', IMAGES)
+configure_uploads(app, photos)
+class UploadForm(FlaskForm):
+    photo = FileField(
+        validators=[
+            FileAllowed(photos, 'Only images are allowed!'),
+            FileRequired('File was empty!')
+        ]
+    )
+    submit = SubmitField('Upload')
+    
 @app.route('/user', methods=['GET', 'POST'])
 def user():
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -88,6 +110,22 @@ def user():
     if 'loggedin' in session and session['username'] == account['username']:
         return render_template('user.html', username=session['username'])
     return redirect(url_for('user'))
+
+@app.route('/uploads/<filename>')
+def get_file(filename):
+    return send_from_directory(app.config['UPLOADED_PHOTOS_DEST'], filename)
+
+
+@app.route('/post', methods=['GET', 'POST'])
+def upload_image():
+    form = UploadForm()
+    if form.validate_on_submit():
+        filename = photos.save(form.photo.data)
+        file_url = url_for('get_file', filename=filename)
+    else:
+        file_url = None
+    return render_template('post.html', form=form, file_url=file_url)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
