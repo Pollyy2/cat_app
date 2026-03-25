@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, send_from_directory, url_for, session
+from flask import Flask, flash, render_template, request, redirect, send_from_directory, url_for, session
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
@@ -101,7 +101,7 @@ class UploadForm(FlaskForm):
         ]
     )
     submit = SubmitField('Upload')
-    
+
 @app.route('/user', methods=['GET', 'POST'])
 def user():
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -116,16 +116,29 @@ def get_file(filename):
     return send_from_directory(app.config['UPLOADED_PHOTOS_DEST'], filename)
 
 
-@app.route('/post', methods=['GET', 'POST'])
-def upload_image():
-    form = UploadForm()
-    if form.validate_on_submit():
-        filename = photos.save(form.photo.data)
-        file_url = url_for('get_file', filename=filename)
-    else:
-        file_url = None
-    return render_template('post.html', form=form, file_url=file_url)
+      
+#route for catalogue page
+@app.route('/catalogue', methods=['GET', 'POST'])
+def catalogue():
+    if 'loggedin' not in session:
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        cat_name = request.form['cat_name']
+        cat_age = request.form['cat_age']
+        cat_breed = request.form['cat_breed']
+        contact = request.form['contact']
+        filename = photos.save(request.files['photo'])
 
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('INSERT INTO cats (cat_name, cat_age, cat_breed, contact, image, user_id) VALUES (%s, %s, %s, %s, %s, %s)', (cat_name, cat_age, cat_breed, contact, filename, session['id']))
+        mysql.connection.commit()
+        flash('Cat submitted successfully!')
+
+        return redirect(url_for('catalogue'))
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM cats')    
+    cats = cursor.fetchall()
+    return render_template('catalogue.html', cats=cats)
 
 if __name__ == '__main__':
     app.run(debug=True)
