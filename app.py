@@ -134,11 +134,20 @@ def catalogue():
         mysql.connection.commit()
         flash('Cat submitted successfully!')
 
-        return redirect(url_for('catalogue'))
+        return redirect(url_for('cats'))
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM cats')    
     cats = cursor.fetchall()
     return render_template('catalogue.html', cats=cats)
+
+@app.route('/cats')
+def cats():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM cats')
+    cats = cursor.fetchall()
+    return render_template('cats.html', cats=cats)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

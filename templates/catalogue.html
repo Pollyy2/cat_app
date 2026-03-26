@@ -20,23 +20,7 @@
 
             <button class="btn" type="submit">Add Cat</button>
         </form>
-    </div>
-    <div class="container">
-        <h2>All Cats</h2>
-        {% if cats %}
-            {% for cat in cats %}
-                <div class="border">
-                    <h3>{{ cat.cat_name }}</h3>
-                <p>Age: {{ cat.cat_age }}</p>
-                <p>Breed: {{ cat.cat_breed }}</p>
-                <p>Contact: {{ cat.contact }}</p>
-                <img src="{{ url_for('get_file', filename=cat.image) }}" width="200">
-            </div>
-        {% endfor %}
-        {% else %}
-            <p>No cats available.</p>
-        {% endif %}
-        <a href="{{ url_for('logout') }}">Logout</a>
-    </div>
+
+
 
 </body>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <title>Catalogue</title>
+</head>
+<body class="catalog-page">    
+    <div class="cat_container">
+    <h2>All Cats</h2>
+    
+    {% if cats %}
+        <div class="cats-grid">
+            {% for cat in cats %}
+                <div class="cat-card">
+                    <h3>{{ cat.cat_name }}</h3>
+                    <p>Age: {{ cat.cat_age }}</p>
+                    <p>Breed: {{ cat.cat_breed }}</p>
+                    <p>Contact: {{ cat.contact }}</p>
+                    <img src="{{ url_for('get_file', filename=cat.image) }}" width="200">
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No cats available.</p>
+    {% endif %}
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+</div>
+</body>
