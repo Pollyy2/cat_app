@@ -14,16 +14,14 @@
         <div class="cats-grid">
             {% for cat in cats %}
                 <div class="cat-card">
-                    <h3>{{ cat.cat_name }}</h3>
+                    <h2>{{ cat.cat_name }}</h2>
                     <p>Age: {{ cat.cat_age }}</p>
                     <p>Breed: {{ cat.cat_breed }}</p>
-                    <p>Contact: {{ cat.contact }}</p>
                     <img src="{{ url_for('get_file', filename=cat.image) }}" width="200">
+                    <button class="btn" type="submit" onclick="alert(' Hey, {{ session.username }}! Use this contact information to connect with owner. Contact: {{ cat.contact }}')">I want this cat</button>
                 </div>
             {% endfor %}
         </div>
-    {% else %}
-        <p>No cats available.</p>
     {% endif %}
 
     <a href="{{ url_for('logout') }}">Logout</a>
