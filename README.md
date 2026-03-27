@@ -15,17 +15,17 @@ A simple web application for posting and browsing cat listings.
 
 ![Login](images/login.png)
 
-### Catalog
+### Role
 
-![Catalog](images/catalogue.png)
+![Role](images/role.png)
 
 ### Add Cat
 
 ![Add Cat](images/upload.png)
 
-### Contact
+### Catalog
 
-![Contact](images/role.png)
+![Catalog](images/catalogue.png)
 
 ## Technologies
 
