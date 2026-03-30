@@ -6,6 +6,7 @@ from flask_uploads import IMAGES, UploadSet, configure_uploads
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileRequired, FileField
 from wtforms import SubmitField
+from flask_mysqldb import MySQL
 
 
 

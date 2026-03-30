@@ -1,0 +1,7 @@
+Flask
+gunicorn
+Flask-MySQLdb
+Flask-Uploads
+Flask-WTF
+WTForms
+mysqlclient
