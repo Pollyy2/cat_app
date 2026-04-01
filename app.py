@@ -2,11 +2,9 @@ from flask import Flask, flash, render_template, request, redirect, send_from_di
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
-from flask_uploads import IMAGES, UploadSet, configure_uploads
-from flask_wtf import FlaskForm
-from flask_wtf.file import FileAllowed, FileRequired, FileField
-from wtforms import SubmitField
 from flask_mysqldb import MySQL
+from flask import Flask, request, jsonify
+import os
 
 
 
@@ -22,8 +20,7 @@ app.config['MYSQL_PASSWORD'] = 'poli20'  # MySql password
 app.config['MYSQL_DB'] = 'cat_app'
 #configurating for photos upload
 app.config['SECRET_KEY'] = '123321'
-app.config['UPLOADED_PHOTOS_DEST'] = 'uploads'
-
+app.config['UPLOAD_FOLDER'] = 'uploads'
 
 mysql = MySQL(app)
 
@@ -92,17 +89,6 @@ def admin():
     return redirect(url_for('admin'))
 
 # route for user page
-photos = UploadSet('photos', IMAGES)
-configure_uploads(app, photos)
-class UploadForm(FlaskForm):
-    photo = FileField(
-        validators=[
-            FileAllowed(photos, 'Only images are allowed!'),
-            FileRequired('File was empty!')
-        ]
-    )
-    submit = SubmitField('Upload')
-
 @app.route('/user', methods=['GET', 'POST'])
 def user():
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -114,7 +100,7 @@ def user():
 
 @app.route('/uploads/<filename>')
 def get_file(filename):
-    return send_from_directory(app.config['UPLOADED_PHOTOS_DEST'], filename)
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
       
@@ -128,7 +114,9 @@ def catalogue():
         cat_age = request.form['cat_age']
         cat_breed = request.form['cat_breed']
         contact = request.form['contact']
-        filename = photos.save(request.files['photo'])
+        file = request.files['photo']
+        filename = file.filename
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('INSERT INTO cats (cat_name, cat_age, cat_breed, contact, image, user_id) VALUES (%s, %s, %s, %s, %s, %s)', (cat_name, cat_age, cat_breed, contact, filename, session['id']))
