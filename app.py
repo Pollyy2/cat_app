@@ -1,12 +1,10 @@
-from flask import Flask, flash, render_template, request, redirect, send_from_directory, url_for, session
-from flask_mysqldb import MySQL
-import MySQLdb.cursors
-import re
-from flask_mysqldb import MySQL
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, redirect, send_from_directory, url_for, session
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 import os
+import re
+from db import get_db
+import MySQLdb.cursors
 load_dotenv()
 
 
@@ -17,17 +15,16 @@ app = Flask(__name__)
 
 
 # configuring MySQL database connection
-app.config['MYSQL_HOST'] = os.getenv("DB_HOST")
-app.config['MYSQL_PORT'] = 19532
-app.config['MYSQL_USER'] = os.getenv("DB_USER")
-app.config['MYSQL_PASSWORD'] = os.getenv("DB_PASSWORD")
-app.config['MYSQL_DB'] = os.getenv("DB_NAME")
+app.config['MYSQL_HOST'] = os.getenv("MYSQL_HOST")
+app.config['MYSQL_PORT'] = int(os.getenv("MYSQL_PORT"))
+app.config['MYSQL_USER'] = os.getenv("MYSQL_USER")
+app.config['MYSQL_PASSWORD'] = os.getenv("MYSQL_PASSWORD")
+app.config['MYSQL_DB'] = os.getenv("MYSQL_DB")
 app.config['MYSQL_SSL'] = {'ssl': {}}
 #configurating for photos upload
 app.config['SECRET_KEY'] = '123321'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
-mysql = MySQL(app)
 
 # defining routes for the app
 @app.route('/')
@@ -38,7 +35,8 @@ def login():
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         username = request.form['username']
         password = request.form['password']
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        db = get_db()
+        cursor = db.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM accounts WHERE username = %s AND password = %s', (username, password))
         account = cursor.fetchone()
         if account:
@@ -66,7 +64,8 @@ def register():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        db = get_db()
+        cursor = db.cursor()
         cursor.execute('SELECT * FROM accounts WHERE username = %s', (username,))
         account = cursor.fetchone()
         if account:
@@ -79,29 +78,31 @@ def register():
             msg = 'Please fill out the form!'
         else:
             cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (username, password, email))
-            mysql.connection.commit()
+            db.commit()
             msg = 'You have successfully registered!'
     return render_template('register.html', msg=msg)
 
 # route for admin page
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    db = get_db()
+    cursor = db.cursor()
     cursor.execute('SELECT * FROM accounts WHERE username = %s', (session['username'],))
     account = cursor.fetchone()
     if 'loggedin' in session and session['username'] == account['username']:
         return render_template('admin.html', username=session['username'])
-    return redirect(url_for('admin'))
+    return redirect(url_for('login'))
 
 # route for user page
 @app.route('/user', methods=['GET', 'POST'])
 def user():
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    db = get_db()
+    cursor = db.cursor()
     cursor.execute('SELECT * FROM accounts WHERE username = %s', (session['username'],))
     account = cursor.fetchone()
     if 'loggedin' in session and session['username'] == account['username']:
         return render_template('user.html', username=session['username'])
-    return redirect(url_for('user'))
+    return redirect(url_for('login'))
 
 @app.route('/uploads/<filename>')
 def get_file(filename):
@@ -127,27 +128,30 @@ def catalogue():
         else:
             filename = None
 
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        db = get_db()
+        cursor = db.cursor()
         try:
             cursor.execute(
                 'INSERT INTO cats (cat_name, cat_age, cat_breed, contact, image, user_id) VALUES (%s,%s,%s,%s,%s,%s)',
                 (cat_name, cat_age, cat_breed, contact, filename, session['id'])
             )
-            mysql.connection.commit()
+            db.commit()
             print("INSERT OK")
 
         except Exception as e:
             print("INSERT ERROR:", e)
 
         return redirect(url_for('cats'))
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute('SELECT * FROM cats')    
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM cats')
     cats = cursor.fetchall()
     return render_template('catalogue.html', cats=cats)
 
 @app.route('/cats')
 def cats():
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    db = get_db()
+    cursor = db.cursor()
     cursor.execute('SELECT * FROM cats')
     cats = cursor.fetchall()
     return render_template('cats.html', cats=cats)
