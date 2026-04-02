@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 # configuring MySQL database connection
 app.config['MYSQL_HOST'] = os.getenv("DB_HOST")
-app.config['MYSQL_PORT'] = int(os.getenv("DB_PORT"))
+app.config['MYSQL_PORT'] = 19532
 app.config['MYSQL_USER'] = os.getenv("DB_USER")
 app.config['MYSQL_PASSWORD'] = os.getenv("DB_PASSWORD")
 app.config['MYSQL_DB'] = os.getenv("DB_NAME")
