@@ -5,3 +5,4 @@ Flask-Uploads
 Flask-WTF
 WTForms
 mysqlclient
+python-dotenv

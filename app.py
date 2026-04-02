@@ -4,7 +4,10 @@ import MySQLdb.cursors
 import re
 from flask_mysqldb import MySQL
 from flask import Flask, request, jsonify
+from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
 import os
+load_dotenv()
 
 
 
@@ -14,10 +17,12 @@ app = Flask(__name__)
 
 
 # configuring MySQL database connection
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'poli20'  # MySql password 
-app.config['MYSQL_DB'] = 'cat_app'
+app.config['MYSQL_HOST'] = os.getenv("DB_HOST")
+app.config['MYSQL_PORT'] = int(os.getenv("DB_PORT"))
+app.config['MYSQL_USER'] = os.getenv("DB_USER")
+app.config['MYSQL_PASSWORD'] = os.getenv("DB_PASSWORD")
+app.config['MYSQL_DB'] = os.getenv("DB_NAME")
+app.config['MYSQL_SSL'] = {'ssl': {}}
 #configurating for photos upload
 app.config['SECRET_KEY'] = '123321'
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -114,14 +119,25 @@ def catalogue():
         cat_age = request.form['cat_age']
         cat_breed = request.form['cat_breed']
         contact = request.form['contact']
-        file = request.files['photo']
-        filename = file.filename
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        file = request.files.get('photo')
+
+        if file and file.filename != '':
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        else:
+            filename = None
 
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('INSERT INTO cats (cat_name, cat_age, cat_breed, contact, image, user_id) VALUES (%s, %s, %s, %s, %s, %s)', (cat_name, cat_age, cat_breed, contact, filename, session['id']))
-        mysql.connection.commit()
-        flash('Cat submitted successfully!')
+        try:
+            cursor.execute(
+                'INSERT INTO cats (cat_name, cat_age, cat_breed, contact, image, user_id) VALUES (%s,%s,%s,%s,%s,%s)',
+                (cat_name, cat_age, cat_breed, contact, filename, session['id'])
+            )
+            mysql.connection.commit()
+            print("INSERT OK")
+
+        except Exception as e:
+            print("INSERT ERROR:", e)
 
         return redirect(url_for('cats'))
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -136,7 +152,7 @@ def cats():
     cats = cursor.fetchall()
     return render_template('cats.html', cats=cats)
 
-
+print(app.url_map)
 
 if __name__ == '__main__':
     app.run(debug=True)
