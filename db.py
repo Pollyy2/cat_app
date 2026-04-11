@@ -1,43 +1,29 @@
-import os
-import MySQLdb
+import sqlite3
 
 def get_db():
-    return MySQLdb.connect(
-        host=os.getenv("MYSQL_HOST"),
-        user=os.getenv("MYSQL_USER"),
-        password=os.getenv("MYSQL_PASSWORD"),
-        database=os.getenv("MYSQL_DB"),
-        port=int(os.getenv("MYSQL_PORT", 3306)),
-        ssl={"ssl": {}}
-    )
-
+    con = sqlite3.connect('database.db')
+    con.row_factory = sqlite3.Row
+    return con
 
 def init_db():
-    db = get_db()
-    cursor = db.cursor()
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("CREATE TABLE if not exists cats(id INTEGER PRIMARY KEY AUTOINCREMENT, cat_name TEXT, cat_age INTEGER, cat_breed TEXT, contact TEXT, image TEXT, user_id INTEGER)")
+    cur.execute("CREATE TABLE if not exists accounts(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, email TEXT)")
+    con.commit()
+    con.close()
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS cats (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        cat_name VARCHAR(100),
-        cat_age INT,
-        cat_breed VARCHAR(100),
-        contact VARCHAR(100),
-        image VARCHAR(255),
-        user_id INT
-    )
-    """)
+def add_cat(cat_name, cat_age, cat_breed, contact, image, user_id):
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT INTO cats (cat_name, cat_age, cat_breed, contact, image, user_id) VALUES (?, ?, ?, ?, ?, ?)", (cat_name, cat_age, cat_breed, contact, image, user_id))
+    con.commit()
+    con.close()
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS accounts (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(50),
-        password VARCHAR(255),
-        email VARCHAR(100)
-    )
-    """)
-
-    db.commit()
-    db.close()
-
+def add_account(username, password, email):
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT INTO accounts (username, password, email) VALUES (?, ?, ?)", (username, password, email))
+    con.commit()
+    con.close()
 

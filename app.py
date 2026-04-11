@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 import re
 from db import get_db
-import MySQLdb.cursors
+from db import add_account, add_cat
 load_dotenv()
 
 
@@ -13,14 +13,6 @@ load_dotenv()
 app = Flask(__name__)
 
 
-
-# configuring MySQL database connection
-app.config['MYSQL_HOST'] = os.getenv("MYSQL_HOST")
-app.config['MYSQL_PORT'] = int(os.getenv("MYSQL_PORT"))
-app.config['MYSQL_USER'] = os.getenv("MYSQL_USER")
-app.config['MYSQL_PASSWORD'] = os.getenv("MYSQL_PASSWORD")
-app.config['MYSQL_DB'] = os.getenv("MYSQL_DB")
-app.config['MYSQL_SSL'] = {'ssl': {}}
 #configurating for photos upload
 app.config['SECRET_KEY'] = '123321'
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -36,7 +28,8 @@ def login():
         username = request.form['username']
         password = request.form['password']
         db = get_db()
-        cursor = db.cursor(MySQLdb.cursors.DictCursor)
+        con = sqlite3.connect('database.db')
+        cursor = con.cursor()
         cursor.execute('SELECT * FROM accounts WHERE username = %s AND password = %s', (username, password))
         account = cursor.fetchone()
         if account:
