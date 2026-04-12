@@ -41,3 +41,6 @@ Create a database named `cat_app` and configure your MySQL credentials.
 
 python app.py
 
+## Live Demo
+The application is deployed and can be accessed here:
+https://cat-app-rhie.onrender.com
